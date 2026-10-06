@@ -1,0 +1,487 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Laboratorio de matrices</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Concepto: banco de trabajo con plano cartesiano a la izquierda y controles de matrices a la derecha; tres pestañas (Transformar, Sistemas, Actividad). */
+:root {
+  --bg: #EEF2F6;
+  --surface: #FBFCFD;
+  --ink: #0F1E2E;
+  --muted: #4A5A6A;
+  --line: #D3DCE5;
+  --grid: #E3E9EF;
+  --axis: #0F1E2E;
+  --teal: #0A7A70;
+  --teal-soft: rgba(14, 158, 145, 0.16);
+  --orange: #A8520A;
+  --orange-soft: rgba(224, 123, 16, 0.16);
+  --ghost: #8C9BAA;
+  --plum: #6B4BA8;
+  --ok: #1B7F3B;
+  --bad: #B3261E;
+  --font-body: 'DM Sans', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1724; --surface: #132538; --ink: #EAF0F5; --muted: #A9BBCC; --line: #27425C; --grid: #1D3349; --axis: #EAF0F5;
+    --teal: #2EC4B6; --teal-soft: rgba(46, 196, 182, 0.2); --orange: #FF9F43; --orange-soft: rgba(255, 159, 67, 0.2);
+    --ghost: #6F859A; --ok: #4AD07A; --bad: #FF7B72; --plum: #B79CF0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1724; --surface: #132538; --ink: #EAF0F5; --muted: #A9BBCC; --line: #27425C; --grid: #1D3349; --axis: #EAF0F5;
+  --teal: #2EC4B6; --teal-soft: rgba(46, 196, 182, 0.2); --orange: #FF9F43; --orange-soft: rgba(255, 159, 67, 0.2);
+  --ghost: #6F859A; --ok: #4AD07A; --bad: #FF7B72; --plum: #B79CF0; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; padding-inline: 16px; padding-block: 24px 48px; }
+.wrap { max-width: 1120px; margin-inline: auto; display: flex; flex-direction: column; gap: 24px; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; }
+h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.1; margin: 0; text-wrap: balance; }
+.kicker { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin: 0 0 6px; }
+.tabs { width: 100%; display: flex; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
+.tabs button { flex: 1; min-width: 0; min-height: 44px; font: inherit; font-size: 0.95rem; font-weight: 500; border: 0; background: transparent; color: var(--muted); padding: 8px 4px; border-radius: 9px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.stage { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (min-width: 600px) { .tabs { width: auto; } .tabs button { flex: none; padding-inline: 16px; } }
+@media (max-width: 860px) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+}
+/* En el celular el plano queda fijo arriba: se ve la figura mientras se cambian los números. */
+@media (max-width: 860px) and (min-height: 600px) {
+  .stage { display: flex; flex-direction: column; gap: 16px; }
+  .plot { position: sticky; top: 0; z-index: 2; padding: 8px; box-shadow: 0 6px 12px -8px var(--ink); }
+  .plot canvas { width: min(100%, 560px, 34vh); }
+  @supports (height: 1svh) { .plot canvas { width: min(100%, 560px, 34svh); } }
+  .legend { padding: 6px 4px 0; gap: 4px 14px; font-size: 0.85rem; }
+}
+.plot { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px; }
+canvas { width: 100%; aspect-ratio: 1; display: block; max-width: 560px; margin-inline: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 10px 6px 2px; font-size: 0.9rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.panel { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.box h2 { font-size: 1.05rem; margin: 0; }
+.box p { margin: 0; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chips button { font: inherit; font-size: 1rem; min-height: 44px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+.chips button:hover { border-color: var(--teal); }
+.mgrid { display: grid; grid-template-columns: repeat(2, minmax(56px, 76px)); gap: 8px; padding: 8px 14px; border-left: 4px solid var(--orange); border-right: 4px solid var(--orange); border-radius: 12px; }
+.vgrid { display: grid; grid-template-columns: minmax(56px, 76px); gap: 8px; padding: 8px 14px; border-left: 4px solid var(--teal); border-right: 4px solid var(--teal); border-radius: 12px; }
+input[type="number"], input[type="text"], select { font-family: var(--font-mono); font-size: 1rem; width: 100%; min-height: 44px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); text-align: center; min-width: 0; }
+select { text-align: left; font-family: var(--font-body); width: auto; max-width: 100%; }
+input[type="range"] { width: 100%; height: 36px; accent-color: var(--teal); }
+.row > label { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 1.05rem; }
+input[type="radio"] { width: 22px; height: 22px; accent-color: var(--teal); }
+button { touch-action: manipulation; }
+.eq { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-family: var(--font-mono); }
+.op { font-family: var(--font-mono); font-size: 1.4rem; color: var(--muted); }
+.mat { display: inline-grid; grid-template-columns: repeat(2, auto); gap: 2px 14px; padding: 4px 12px; border-left: 3px solid var(--orange); border-right: 3px solid var(--orange); border-radius: 8px; font-family: var(--font-mono); text-align: center; }
+.mat.v { grid-template-columns: auto; border-color: var(--teal); }
+.out { font-family: var(--font-mono); font-size: 0.95rem; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tag { font-family: var(--font-body); font-size: 0.85rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+.tag.t { background: var(--teal-soft); color: var(--teal); }
+.tag.o { background: var(--orange-soft); color: var(--orange); }
+.status { font-weight: 700; }
+.status.ok { color: var(--ok); }
+.status.bad { color: var(--bad); }
+.mono { font-family: var(--font-mono); }
+.challenge { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 90px)); gap: 8px; }
+.btn { font: inherit; font-weight: 700; min-height: 44px; border: 0; background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 10px; cursor: pointer; }
+.btn.alt { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 500; }
+label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 4px; }
+.hint { font-size: 0.9rem; color: var(--muted); }
+.sol { font-family: var(--font-mono); font-size: 0.9rem; background: var(--bg); border-radius: 8px; padding: 8px 10px; color: var(--ink); }
+/* Actividad: cada desafío con su color de acento. */
+.grid3 .box { --acc: var(--teal); border-top: 4px solid var(--acc); background: linear-gradient(color-mix(in srgb, var(--acc) 6%, transparent), transparent 140px), var(--surface); }
+.grid3 .box:nth-child(2) { --acc: var(--orange); }
+.grid3 .box:nth-child(3) { --acc: var(--plum); }
+.grid3 .box h2 { color: var(--acc); }
+.grid3 .box p.mono { background: color-mix(in srgb, var(--acc) 10%, var(--surface)); border-radius: 8px; padding: 8px 10px; color: var(--ink); }
+.grid3 .box .sol { border-left: 4px solid var(--acc); }
+.grid3 .btn:not(.alt) { background: var(--acc); color: var(--surface); }
+#p-actividad > .panel > .row:first-child { background: color-mix(in srgb, var(--teal) 8%, var(--surface)); border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: 12px; padding: 12px 14px; }
+#p-actividad > .panel > .row:first-child p { margin: 0; color: var(--ink); }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+<header>
+<div>
+<p class="kicker">Matemática Discreta · Aplicaciones de matrices</p>
+<h1>Laboratorio de matrices</h1>
+</div>
+<div class="tabs" role="tablist" aria-label="Secciones del laboratorio">
+<button role="tab" id="tab-transformar" aria-selected="true" aria-controls="p-transformar" data-tab="transformar">Transformar</button>
+<button role="tab" id="tab-sistemas" aria-selected="false" aria-controls="p-sistemas" data-tab="sistemas">Sistemas</button>
+<button role="tab" id="tab-actividad" aria-selected="false" aria-controls="p-actividad" data-tab="actividad">Actividad</button>
+</div>
+</header>
+
+<!-- TRANSFORMAR -->
+<section id="p-transformar" role="tabpanel" aria-labelledby="tab-transformar">
+<div class="stage">
+<div class="plot">
+<canvas id="cv1" aria-label="Plano con la letra F original y transformada por las matrices elegidas"></canvas>
+<div class="legend" id="leg1"></div>
+</div>
+<div class="panel">
+<div class="box">
+<h2>Matriz A</h2>
+<div class="row chips" data-target="A">
+<button data-p="id">Identidad</button><button data-p="esc">Escalado ×2</button><button data-p="ref">Reflexión</button><button data-p="rot">Rotación 90°</button><button data-p="cor">Corte</button>
+</div>
+<div class="mgrid" id="gridA">
+<input type="number" step="any" id="a0" value="1" aria-label="A fila 1 columna 1">
+<input type="number" step="any" id="a1" value="0" aria-label="A fila 1 columna 2">
+<input type="number" step="any" id="a2" value="0" aria-label="A fila 2 columna 1">
+<input type="number" step="any" id="a3" value="1" aria-label="A fila 2 columna 2">
+</div>
+<div>
+<label class="l" for="ang">Ángulo de giro: <span id="angv" class="mono">0°</span> (carga una matriz de rotación en A)</label>
+<input type="range" id="ang" min="0" max="360" step="5" value="0">
+</div>
+</div>
+<div class="box">
+<h2>Vector v</h2>
+<div class="row">
+<div style="width:90px"><label class="l" for="vx">x</label><input type="number" step="any" id="vx" value="2"></div>
+<div style="width:90px"><label class="l" for="vy">y</label><input type="number" step="any" id="vy" value="1"></div>
+</div>
+<div class="out" id="outV"></div>
+</div>
+<div class="box">
+<h2>Componer con una segunda matriz B</h2>
+<div class="row">
+<label><input type="radio" name="mode" id="mode-solo" checked> Solo A</label>
+<label><input type="radio" name="mode" id="mode-comp"> Componer A y B</label>
+</div>
+<div id="compBox" hidden>
+<div class="row chips" data-target="B" style="margin-bottom:10px">
+<button data-p="id">Identidad</button><button data-p="esc">Escalado ×2</button><button data-p="ref">Reflexión</button><button data-p="rot">Rotación 90°</button><button data-p="cor">Corte</button>
+</div>
+<div class="mgrid" id="gridB">
+<input type="number" step="any" id="b0" value="0" aria-label="B fila 1 columna 1">
+<input type="number" step="any" id="b1" value="-1" aria-label="B fila 1 columna 2">
+<input type="number" step="any" id="b2" value="1" aria-label="B fila 2 columna 1">
+<input type="number" step="any" id="b3" value="0" aria-label="B fila 2 columna 2">
+</div>
+<div class="out" id="outC" style="margin-top:12px"></div>
+<p class="hint" style="margin-top:8px">Ejemplo: A estira solo en x (2, 0, 0, 1) y B gira 90°. Las dos figuras no coinciden: el orden importa.</p>
+<button class="btn alt" id="loadEj" style="margin-top:8px">Cargar este ejemplo</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- SISTEMAS -->
+<section id="p-sistemas" role="tabpanel" aria-labelledby="tab-sistemas" hidden>
+<div class="stage">
+<div class="plot">
+<canvas id="cv2" aria-label="Plano con las dos rectas del sistema y su punto de cruce"></canvas>
+<div class="legend"><span><i class="dot" style="background:var(--teal)"></i>Ecuación 1</span><span><i class="dot" style="background:var(--orange)"></i>Ecuación 2</span><span><i class="dot" style="background:var(--ink)"></i>Solución</span></div>
+</div>
+<div class="panel">
+<div class="box">
+<h2>Sistema A · x = b</h2>
+<div class="row chips" id="sysPresets">
+<button data-s="cont">Contenedores</button><button data-s="par">Sin solución</button><button data-s="inf">Infinitas</button><button data-s="api">GET y POST</button>
+</div>
+<div class="eq">
+<div class="mgrid">
+<input type="number" step="any" id="s0" value="1" aria-label="A fila 1 columna 1">
+<input type="number" step="any" id="s1" value="2" aria-label="A fila 1 columna 2">
+<input type="number" step="any" id="s2" value="2" aria-label="A fila 2 columna 1">
+<input type="number" step="any" id="s3" value="6" aria-label="A fila 2 columna 2">
+</div>
+<span class="op">·</span>
+<span class="mat v"><span>x</span><span>y</span></span>
+<span class="op">=</span>
+<div class="vgrid">
+<input type="number" step="any" id="s4" value="8" aria-label="b fila 1">
+<input type="number" step="any" id="s5" value="20" aria-label="b fila 2">
+</div>
+</div>
+<div class="out" id="sysEq"></div>
+</div>
+<div class="box">
+<h2>Resultado</h2>
+<div class="out"><span>Estado:</span><span class="status" id="sysState"></span></div>
+<div class="out" id="sysSol"></div>
+<div class="out" id="sysDet"></div>
+<div class="out" id="sysInv"></div>
+<div class="sol" id="sysCheck"></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ACTIVIDAD -->
+<section id="p-actividad" role="tabpanel" aria-labelledby="tab-actividad" hidden>
+<div class="panel">
+<div class="row" style="justify-content:space-between">
+<p>Resolvé primero en papel y después comprobá acá. Podés usar las otras pestañas para verificar.</p>
+<button class="btn alt" id="teacher" aria-pressed="false">Modo docente: mostrar respuestas</button>
+</div>
+<div class="grid3">
+<div class="box">
+<h2>1 · Reconocer</h2>
+<p class="mono">A = [0, 1; −1, 0] &nbsp; v = (2, 1)</p>
+<p>Calculá A·v e indicá qué transformación es.</p>
+<div class="challenge">
+<div class="pair"><div><label class="l" for="c1x">x</label><input type="text" inputmode="decimal" id="c1x"></div><div><label class="l" for="c1y">y</label><input type="text" inputmode="decimal" id="c1y"></div></div>
+<div><label class="l" for="c1t">Transformación</label>
+<select id="c1t"><option value="">Elegir…</option><option value="anti">Rotación 90° antihoraria</option><option value="hor">Rotación 90° horaria</option><option value="esc">Escalado</option><option value="ref">Reflexión</option><option value="cor">Corte</option></select></div>
+<div class="row"><button class="btn" data-check="1">Comprobar</button><span class="status" id="r1" role="status"></span></div>
+<div class="sol" id="s1sol" hidden>A·v = (1, −2). Es una rotación de 90° en sentido horario.</div>
+</div>
+</div>
+<div class="box">
+<h2>2 · Ordenar</h2>
+<p class="mono">S = [2, 0; 0, 1] &nbsp; T = [1, 1; 0, 1] &nbsp; v = (1, 2)</p>
+<p>Calculá T·(S·v) y S·(T·v). ¿Coinciden?</p>
+<div class="challenge">
+<div><label class="l">T·(S·v)</label><div class="pair"><input type="text" inputmode="decimal" id="c2ax" aria-label="T por S por v, x"><input type="text" inputmode="decimal" id="c2ay" aria-label="T por S por v, y"></div></div>
+<div><label class="l">S·(T·v)</label><div class="pair"><input type="text" inputmode="decimal" id="c2bx" aria-label="S por T por v, x"><input type="text" inputmode="decimal" id="c2by" aria-label="S por T por v, y"></div></div>
+<div><label class="l" for="c2s">¿Coinciden?</label><select id="c2s"><option value="">Elegir…</option><option value="si">Sí</option><option value="no">No</option></select></div>
+<div class="row"><button class="btn" data-check="2">Comprobar</button><span class="status" id="r2" role="status"></span></div>
+<div class="sol" id="s2sol" hidden>T·(S·v) = (4, 2) y S·(T·v) = (6, 2). No coinciden: el orden importa.</div>
+</div>
+</div>
+<div class="box">
+<h2>3 · Resolver</h2>
+<p>Una API recibió 10 peticiones. Cada GET cuesta 2 créditos y cada POST 3. Se gastaron 24 créditos.</p>
+<div class="challenge">
+<div class="pair"><div><label class="l" for="c3x">GET</label><input type="text" inputmode="decimal" id="c3x"></div><div><label class="l" for="c3y">POST</label><input type="text" inputmode="decimal" id="c3y"></div></div>
+<p class="hint">Pista: x + y = 10 y 2x + 3y = 24. Cargalo en la pestaña Sistemas con el botón GET y POST.</p>
+<div class="row"><button class="btn" data-check="3">Comprobar</button><span class="status" id="r3" role="status"></span></div>
+<div class="sol" id="s3sol" hidden>A = [1, 1; 2, 3], b = (10, 24). Solución: 6 GET y 4 POST. Verificación: 6 + 4 = 10 y 2·6 + 3·4 = 24.</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var cv = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+  function num(id) { var v = parseFloat(String($(id).value).replace(',', '.')); return isNaN(v) ? 0 : v; }
+  function parse(s) { var v = parseFloat(String(s).replace(',', '.')); return isNaN(v) ? NaN : v; }
+  function fmt(n) { var s = String(+n.toFixed(3)); if (s === '-0') s = '0'; return s.replace('.', ',').replace('-', '−'); }
+  function mul(M, N) { return [M[0]*N[0]+M[1]*N[2], M[0]*N[1]+M[1]*N[3], M[2]*N[0]+M[3]*N[2], M[2]*N[1]+M[3]*N[3]]; }
+  function app(M, p) { return [M[0]*p[0]+M[1]*p[1], M[2]*p[0]+M[3]*p[1]]; }
+  function matH(M) { return '<span class="mat"><span>'+fmt(M[0])+'</span><span>'+fmt(M[1])+'</span><span>'+fmt(M[2])+'</span><span>'+fmt(M[3])+'</span></span>'; }
+  function vecH(v) { return '<span class="mat v"><span>'+fmt(v[0])+'</span><span>'+fmt(v[1])+'</span></span>'; }
+  function getM(p) { return [num(p+'0'), num(p+'1'), num(p+'2'), num(p+'3')]; }
+  function setM(p, M) { for (var i = 0; i < 4; i++) $(p+i).value = M[i]; }
+
+  var PRE = { id: [1,0,0,1], esc: [2,0,0,2], ref: [1,0,0,-1], rot: [0,-1,1,0], cor: [1,1,0,1] };
+  var F = [[0,0],[1,0],[1,1],[2,1],[2,2],[1,2],[1,3],[3,3],[3,4],[0,4]];
+
+  function fit(c) {
+    var w = Math.max(240, Math.round(c.getBoundingClientRect().width));
+    var d = window.devicePixelRatio || 1;
+    c.width = w * d; c.height = w * d;
+    var g = c.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0);
+    return { g: g, w: w };
+  }
+  function arrow(g, x0, y0, x1, y1, col, wd, dash) {
+    g.save(); g.strokeStyle = col; g.fillStyle = col; g.lineWidth = wd; g.setLineDash(dash || []);
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.setLineDash([]);
+    var a = Math.atan2(y1 - y0, x1 - x0), h = 11;
+    g.beginPath(); g.moveTo(x1, y1);
+    g.lineTo(x1 - h*Math.cos(a-0.4), y1 - h*Math.sin(a-0.4));
+    g.lineTo(x1 - h*Math.cos(a+0.4), y1 - h*Math.sin(a+0.4));
+    g.closePath(); g.fill(); g.restore();
+  }
+
+  /* ---------- Transformar ---------- */
+  function drawT() {
+    var c = $('cv1'); if ($('p-transformar').hidden) return;
+    var o = fit(c), g = o.g, W = o.w, R = 8, sc = W / (2 * R);
+    var X = function (x) { return W/2 + x*sc; }, Y = function (y) { return W/2 - y*sc; };
+    g.clearRect(0, 0, W, W);
+    g.lineWidth = 1; g.strokeStyle = cv('--grid');
+    for (var i = -R; i <= R; i++) { g.beginPath(); g.moveTo(X(i), 0); g.lineTo(X(i), W); g.stroke(); g.beginPath(); g.moveTo(0, Y(i)); g.lineTo(W, Y(i)); g.stroke(); }
+    g.strokeStyle = cv('--axis'); g.lineWidth = 2;
+    g.beginPath(); g.moveTo(0, Y(0)); g.lineTo(W, Y(0)); g.stroke(); g.beginPath(); g.moveTo(X(0), 0); g.lineTo(X(0), W); g.stroke();
+    g.fillStyle = cv('--muted'); g.font = '13px ' + cv('--font-mono'); g.textAlign = 'center';
+    for (var k = -R + 2; k <= R - 2; k += 2) { if (k) { g.fillText(k, X(k), Y(0) + 16); g.textAlign = 'right'; g.fillText(k, X(0) - 6, Y(k) + 4); g.textAlign = 'center'; } }
+    function poly(M, stroke, fill, dash) {
+      g.beginPath();
+      F.forEach(function (p, j) { var q = app(M, p); if (j) g.lineTo(X(q[0]), Y(q[1])); else g.moveTo(X(q[0]), Y(q[1])); });
+      g.closePath(); if (fill) { g.fillStyle = fill; g.fill(); }
+      g.lineWidth = 3; g.strokeStyle = stroke; g.setLineDash(dash || []); g.stroke(); g.setLineDash([]);
+    }
+    var A = getM('a'), B = getM('b'), comp = $('mode-comp').checked, v = [num('vx'), num('vy')];
+    poly(PRE.id, cv('--ghost'), null, [6, 5]);
+    var leg = '<span><i class="dot" style="background:var(--ghost)"></i>Original</span>', out = '';
+    if (!comp) {
+      poly(A, cv('--teal'), cv('--teal-soft'));
+      var w = app(A, v);
+      arrow(g, X(0), Y(0), X(v[0]), Y(v[1]), cv('--ghost'), 3, [5, 4]);
+      arrow(g, X(0), Y(0), X(w[0]), Y(w[1]), cv('--orange'), 4);
+      leg += '<span><i class="dot" style="background:var(--teal)"></i>A · figura</span><span><i class="dot" style="background:var(--orange)"></i>A · v</span>';
+      out = matH(A) + '<span class="op">·</span>' + vecH(v) + '<span class="op">=</span>' + vecH(w);
+      $('outC').innerHTML = '';
+    } else {
+      var AB = mul(A, B), BA = mul(B, A), w1 = app(AB, v), w2 = app(BA, v);
+      poly(AB, cv('--teal'), cv('--teal-soft')); poly(BA, cv('--orange'), cv('--orange-soft'));
+      arrow(g, X(0), Y(0), X(v[0]), Y(v[1]), cv('--ghost'), 3, [5, 4]);
+      arrow(g, X(0), Y(0), X(w1[0]), Y(w1[1]), cv('--teal'), 4);
+      arrow(g, X(0), Y(0), X(w2[0]), Y(w2[1]), cv('--orange'), 4);
+      leg += '<span><i class="dot" style="background:var(--teal)"></i>A·B (primero B)</span><span><i class="dot" style="background:var(--orange)"></i>B·A (primero A)</span>';
+      out = '<span class="tag t">A·B·v</span>' + vecH(w1) + '<span class="tag o">B·A·v</span>' + vecH(w2);
+      $('outC').innerHTML = '<span class="tag t">A·B</span>' + matH(AB) + '<span class="tag o">B·A</span>' + matH(BA) +
+        '<span class="status ' + (Math.abs(w1[0]-w2[0]) + Math.abs(w1[1]-w2[1]) < 1e-9 ? 'ok">Coinciden' : 'bad">No coinciden') + '</span>';
+    }
+    $('leg1').innerHTML = leg; $('outV').innerHTML = out;
+  }
+
+  /* ---------- Sistemas ---------- */
+  var SYS = { cont: [1,2,2,6,8,20], par: [1,2,1,2,8,4], inf: [1,2,2,4,8,16], api: [1,1,2,3,10,24] };
+  function solveSys() {
+    var a = num('s0'), b = num('s1'), c = num('s2'), d = num('s3'), e = num('s4'), f = num('s5');
+    var det = a*d - b*c, eps = 1e-9, res = { a:a, b:b, c:c, d:d, e:e, f:f, det:det };
+    if (Math.abs(det) > eps) { res.kind = 'unique'; res.x = (e*d - b*f)/det; res.y = (a*f - e*c)/det; res.inv = [d/det, -b/det, -c/det, a/det]; }
+    else {
+      var allZero = Math.abs(a)+Math.abs(b)+Math.abs(c)+Math.abs(d) < eps, consistent;
+      if (allZero) consistent = Math.abs(e) < eps && Math.abs(f) < eps;
+      else consistent = Math.abs(a*f - c*e) < eps && Math.abs(b*f - d*e) < eps;
+      res.kind = consistent ? 'inf' : 'none';
+    }
+    return res;
+  }
+  function drawS() {
+    if ($('p-sistemas').hidden) return;
+    var r = solveSys(), o = fit($('cv2')), g = o.g, W = o.w, lo = -2, hi = 12, sc = W/(hi-lo);
+    var X = function (x) { return (x-lo)*sc; }, Y = function (y) { return W - (y-lo)*sc; };
+    g.clearRect(0, 0, W, W); g.lineWidth = 1; g.strokeStyle = cv('--grid');
+    for (var i = lo; i <= hi; i++) { g.beginPath(); g.moveTo(X(i), 0); g.lineTo(X(i), W); g.stroke(); g.beginPath(); g.moveTo(0, Y(i)); g.lineTo(W, Y(i)); g.stroke(); }
+    g.strokeStyle = cv('--axis'); g.lineWidth = 2;
+    g.beginPath(); g.moveTo(0, Y(0)); g.lineTo(W, Y(0)); g.stroke(); g.beginPath(); g.moveTo(X(0), 0); g.lineTo(X(0), W); g.stroke();
+    g.fillStyle = cv('--muted'); g.font = '13px ' + cv('--font-mono'); g.textAlign = 'center';
+    for (var k = 2; k <= hi - 1; k += 2) { g.fillText(k, X(k), Y(0) + 16); g.textAlign = 'right'; g.fillText(k, X(0) - 6, Y(k) + 4); g.textAlign = 'center'; }
+    function line(p, q, t, col, wd, dash) {
+      var x0, y0, x1, y1;
+      if (Math.abs(q) > 1e-9) { x0 = lo; x1 = hi; y0 = (t - p*x0)/q; y1 = (t - p*x1)/q; }
+      else if (Math.abs(p) > 1e-9) { x0 = x1 = t/p; y0 = lo; y1 = hi; } else return;
+      g.save(); g.beginPath(); g.rect(0, 0, W, W); g.clip();
+      g.strokeStyle = col; g.lineWidth = wd; g.lineCap = 'round'; g.setLineDash(dash || []);
+      g.beginPath(); g.moveTo(X(x0), Y(y0)); g.lineTo(X(x1), Y(y1)); g.stroke(); g.restore();
+    }
+    line(r.a, r.b, r.e, cv('--teal'), r.kind === 'inf' ? 10 : 5);
+    line(r.c, r.d, r.f, cv('--orange'), r.kind === 'inf' ? 4 : 5, r.kind === 'inf' ? [10, 8] : null);
+    if (r.kind === 'unique') {
+      g.fillStyle = cv('--axis'); g.beginPath(); g.arc(X(r.x), Y(r.y), 8, 0, 6.2832); g.fill();
+      g.fillStyle = cv('--ink'); g.font = '700 14px ' + cv('--font-mono'); g.textAlign = 'left';
+      g.fillText('(' + fmt(r.x) + '; ' + fmt(r.y) + ')', Math.min(X(r.x) + 12, W - 110), Y(r.y) - 12);
+    }
+  }
+  function updateS() {
+    var r = solveSys(), st = $('sysState');
+    $('sysEq').innerHTML = '<span class="tag t">1</span><span>' + fmt(r.a) + 'x + ' + fmt(r.b) + 'y = ' + fmt(r.e) + '</span><span class="tag o">2</span><span>' + fmt(r.c) + 'x + ' + fmt(r.d) + 'y = ' + fmt(r.f) + '</span>';
+    $('sysDet').innerHTML = '<span>Determinante ad − bc =</span><b>' + fmt(r.det) + '</b>';
+    if (r.kind === 'unique') {
+      st.textContent = 'Una solución'; st.className = 'status ok';
+      $('sysSol').innerHTML = '<span>(x, y) =</span><b>(' + fmt(r.x) + '; ' + fmt(r.y) + ')</b>';
+      $('sysInv').innerHTML = '<span>A^-1 =</span>' + matH(r.inv);
+      var l1 = r.a*r.x + r.b*r.y, l2 = r.c*r.x + r.d*r.y;
+      $('sysCheck').textContent = 'Verificación: ' + fmt(r.a) + '·' + fmt(r.x) + ' + ' + fmt(r.b) + '·' + fmt(r.y) + ' = ' + fmt(l1) + ' · ' + fmt(r.c) + '·' + fmt(r.x) + ' + ' + fmt(r.d) + '·' + fmt(r.y) + ' = ' + fmt(l2);
+    } else if (r.kind === 'none') {
+      st.textContent = 'Sin solución'; st.className = 'status bad';
+      $('sysSol').innerHTML = '<span>Las rectas son paralelas y distintas.</span>'; $('sysInv').innerHTML = '<span>A no tiene inversa.</span>';
+      $('sysCheck').textContent = 'Con determinante 0, las filas de A son proporcionales pero b no sigue esa proporción.';
+    } else {
+      st.textContent = 'Infinitas soluciones'; st.className = 'status bad';
+      $('sysSol').innerHTML = '<span>Las dos ecuaciones describen la misma recta.</span>'; $('sysInv').innerHTML = '<span>A no tiene inversa.</span>';
+      $('sysCheck').textContent = 'Con determinante 0, la segunda ecuación es un múltiplo de la primera.';
+    }
+    drawS();
+  }
+
+  /* ---------- Actividad ---------- */
+  function near(a, b) { return !isNaN(a) && Math.abs(a - b) < 1e-6; }
+  function say(id, ok, msg) { var el = $(id); el.textContent = msg; el.className = 'status ' + (ok ? 'ok' : 'bad'); }
+  function check(n) {
+    if (n === 1) {
+      var xo = near(parse($('c1x').value), 1), yo = near(parse($('c1y').value), -2), t = $('c1t').value;
+      if (xo && yo && t === 'hor') say('r1', true, 'Correcto: A·v = (1, −2), rotación horaria.');
+      else if (xo && yo) say('r1', false, 'El vector está bien. Revisá el sentido del giro.');
+      else say('r1', false, 'Revisá el cálculo: cada fila de A se multiplica por (2, 1).');
+    } else if (n === 2) {
+      var p = near(parse($('c2ax').value), 4) && near(parse($('c2ay').value), 2), q = near(parse($('c2bx').value), 6) && near(parse($('c2by').value), 2);
+      if (p && q && $('c2s').value === 'no') say('r2', true, 'Correcto: no coinciden, el orden importa.');
+      else if (p && q) say('r2', false, 'Los dos resultados están bien. Compará (4, 2) con (6, 2).');
+      else say('r2', false, 'Calculá primero lo que está entre paréntesis y después aplicá la otra matriz.');
+    } else {
+      if (near(parse($('c3x').value), 6) && near(parse($('c3y').value), 4)) say('r3', true, 'Correcto: 6 GET y 4 POST.');
+      else say('r3', false, 'Probá de nuevo: x + y = 10 y 2x + 3y = 24.');
+    }
+  }
+
+  /* ---------- Eventos ---------- */
+  document.querySelectorAll('.chips[data-target]').forEach(function (grp) {
+    grp.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      setM(grp.dataset.target === 'A' ? 'a' : 'b', PRE[b.dataset.p]); drawT();
+    });
+  });
+  ['a0','a1','a2','a3','b0','b1','b2','b3','vx','vy'].forEach(function (id) { $(id).addEventListener('input', drawT); });
+  $('loadEj').addEventListener('click', function () { setM('a', [2,0,0,1]); setM('b', PRE.rot); drawT(); });
+  $('mode-solo').addEventListener('change', function () { $('compBox').hidden = true; drawT(); });
+  $('mode-comp').addEventListener('change', function () { $('compBox').hidden = false; drawT(); });
+  $('ang').addEventListener('input', function () {
+    var deg = +$('ang').value, t = deg * Math.PI / 180;
+    $('angv').textContent = deg + '°';
+    setM('a', [Math.cos(t), -Math.sin(t), Math.sin(t), Math.cos(t)].map(function (x) { return +x.toFixed(3); })); drawT();
+  });
+  ['s0','s1','s2','s3','s4','s5'].forEach(function (id) { $(id).addEventListener('input', updateS); });
+  $('sysPresets').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    SYS[b.dataset.s].forEach(function (v, i) { $('s' + i).value = v; }); updateS();
+  });
+  document.querySelectorAll('[data-check]').forEach(function (b) { b.addEventListener('click', function () { check(+b.dataset.check); }); });
+  $('teacher').addEventListener('click', function () {
+    var on = $('teacher').getAttribute('aria-pressed') !== 'true';
+    $('teacher').setAttribute('aria-pressed', String(on));
+    $('teacher').textContent = on ? 'Modo docente: ocultar respuestas' : 'Modo docente: mostrar respuestas';
+    ['s1sol','s2sol','s3sol'].forEach(function (id) { $(id).hidden = !on; });
+  });
+
+  function showTab(name) {
+    ['transformar', 'sistemas', 'actividad'].forEach(function (t) {
+      var on = t === name; $('p-' + t).hidden = !on; $('tab-' + t).setAttribute('aria-selected', String(on));
+      $('tab-' + t).tabIndex = on ? 0 : -1;
+    });
+    if (name === 'transformar') drawT(); if (name === 'sistemas') updateS();
+    try { history.replaceState(null, '', '#' + name); } catch (e) {}
+  }
+  document.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.tab); }); });
+  var TABS = ['transformar', 'sistemas', 'actividad'];
+  document.querySelector('.tabs').addEventListener('keydown', function (e) {
+    var i = TABS.indexOf(e.target.dataset && e.target.dataset.tab); if (i < 0) return;
+    var n = e.key === 'ArrowRight' ? (i + 1) % 3 : e.key === 'ArrowLeft' ? (i + 2) % 3 : e.key === 'Home' ? 0 : e.key === 'End' ? 2 : -1;
+    if (n < 0) return; e.preventDefault(); showTab(TABS[n]); $('tab-' + TABS[n]).focus();
+  });
+  function redraw() { drawT(); drawS(); }
+  window.addEventListener('resize', redraw);
+  if (window.matchMedia) { try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw); } catch (e) {} }
+  new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  var h = (location.hash || '').replace('#', '');
+  showTab(['transformar', 'sistemas', 'actividad'].indexOf(h) >= 0 ? h : 'transformar');
+  updateS();
+})();
+</script>
+
+</body></html>
