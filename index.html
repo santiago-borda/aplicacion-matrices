@@ -103,7 +103,6 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 .grid3 .box:nth-child(3) { --acc: var(--plum); }
 .grid3 .box h2 { color: var(--acc); }
 .grid3 .box p.mono { background: color-mix(in srgb, var(--acc) 10%, var(--surface)); border-radius: 8px; padding: 8px 10px; color: var(--ink); }
-.grid3 .box .sol { border-left: 4px solid var(--acc); }
 .grid3 .btn:not(.alt) { background: var(--acc); color: var(--surface); }
 #p-actividad > .panel > .row:first-child { background: color-mix(in srgb, var(--teal) 8%, var(--surface)); border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: 12px; padding: 12px 14px; }
 #p-actividad > .panel > .row:first-child p { margin: 0; color: var(--ink); }
@@ -228,7 +227,6 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 <div class="panel">
 <div class="row" style="justify-content:space-between">
 <p>Resolvé primero en papel y después comprobá acá. Podés usar las otras pestañas para verificar.</p>
-<button class="btn alt" id="teacher" aria-pressed="false">Modo docente: mostrar respuestas</button>
 </div>
 <div class="grid3">
 <div class="box">
@@ -236,11 +234,10 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 <p class="mono">A = [0, 1; −1, 0] &nbsp; v = (2, 1)</p>
 <p>Calculá A·v e indicá qué transformación es.</p>
 <div class="challenge">
-<div class="pair"><div><label class="l" for="c1x">x</label><input type="text" inputmode="decimal" id="c1x"></div><div><label class="l" for="c1y">y</label><input type="text" inputmode="decimal" id="c1y"></div></div>
+<div class="pair"><div><label class="l" for="c1x">x</label><input autocomplete="off" type="text" inputmode="decimal" id="c1x"></div><div><label class="l" for="c1y">y</label><input autocomplete="off" type="text" inputmode="decimal" id="c1y"></div></div>
 <div><label class="l" for="c1t">Transformación</label>
-<select id="c1t"><option value="">Elegir…</option><option value="anti">Rotación 90° antihoraria</option><option value="hor">Rotación 90° horaria</option><option value="esc">Escalado</option><option value="ref">Reflexión</option><option value="cor">Corte</option></select></div>
+<select autocomplete="off" id="c1t"><option value="">Elegir…</option><option value="anti">Rotación 90° antihoraria</option><option value="hor">Rotación 90° horaria</option><option value="esc">Escalado</option><option value="ref">Reflexión</option><option value="cor">Corte</option></select></div>
 <div class="row"><button class="btn" data-check="1">Comprobar</button><span class="status" id="r1" role="status"></span></div>
-<div class="sol" id="s1sol" hidden>A·v = (1, −2). Es una rotación de 90° en sentido horario.</div>
 </div>
 </div>
 <div class="box">
@@ -248,21 +245,19 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 <p class="mono">S = [2, 0; 0, 1] &nbsp; T = [1, 1; 0, 1] &nbsp; v = (1, 2)</p>
 <p>Calculá T·(S·v) y S·(T·v). ¿Coinciden?</p>
 <div class="challenge">
-<div><label class="l">T·(S·v)</label><div class="pair"><input type="text" inputmode="decimal" id="c2ax" aria-label="T por S por v, x"><input type="text" inputmode="decimal" id="c2ay" aria-label="T por S por v, y"></div></div>
-<div><label class="l">S·(T·v)</label><div class="pair"><input type="text" inputmode="decimal" id="c2bx" aria-label="S por T por v, x"><input type="text" inputmode="decimal" id="c2by" aria-label="S por T por v, y"></div></div>
-<div><label class="l" for="c2s">¿Coinciden?</label><select id="c2s"><option value="">Elegir…</option><option value="si">Sí</option><option value="no">No</option></select></div>
+<div><label class="l">T·(S·v)</label><div class="pair"><input autocomplete="off" type="text" inputmode="decimal" id="c2ax" aria-label="T por S por v, x"><input autocomplete="off" type="text" inputmode="decimal" id="c2ay" aria-label="T por S por v, y"></div></div>
+<div><label class="l">S·(T·v)</label><div class="pair"><input autocomplete="off" type="text" inputmode="decimal" id="c2bx" aria-label="S por T por v, x"><input autocomplete="off" type="text" inputmode="decimal" id="c2by" aria-label="S por T por v, y"></div></div>
+<div><label class="l" for="c2s">¿Coinciden?</label><select autocomplete="off" id="c2s"><option value="">Elegir…</option><option value="si">Sí</option><option value="no">No</option></select></div>
 <div class="row"><button class="btn" data-check="2">Comprobar</button><span class="status" id="r2" role="status"></span></div>
-<div class="sol" id="s2sol" hidden>T·(S·v) = (4, 2) y S·(T·v) = (6, 2). No coinciden: el orden importa.</div>
 </div>
 </div>
 <div class="box">
 <h2>3 · Resolver</h2>
 <p>Una API recibió 10 peticiones. Cada GET cuesta 2 créditos y cada POST 3. Se gastaron 24 créditos.</p>
 <div class="challenge">
-<div class="pair"><div><label class="l" for="c3x">GET</label><input type="text" inputmode="decimal" id="c3x"></div><div><label class="l" for="c3y">POST</label><input type="text" inputmode="decimal" id="c3y"></div></div>
+<div class="pair"><div><label class="l" for="c3x">GET</label><input autocomplete="off" type="text" inputmode="decimal" id="c3x"></div><div><label class="l" for="c3y">POST</label><input autocomplete="off" type="text" inputmode="decimal" id="c3y"></div></div>
 <p class="hint">Pista: x + y = 10 y 2x + 3y = 24. Cargalo en la pestaña Sistemas con el botón GET y POST.</p>
 <div class="row"><button class="btn" data-check="3">Comprobar</button><span class="status" id="r3" role="status"></span></div>
-<div class="sol" id="s3sol" hidden>A = [1, 1; 2, 3], b = (10, 24). Solución: 6 GET y 4 POST. Verificación: 6 + 4 = 10 y 2·6 + 3·4 = 24.</div>
 </div>
 </div>
 </div>
@@ -451,12 +446,6 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
     SYS[b.dataset.s].forEach(function (v, i) { $('s' + i).value = v; }); updateS();
   });
   document.querySelectorAll('[data-check]').forEach(function (b) { b.addEventListener('click', function () { check(+b.dataset.check); }); });
-  $('teacher').addEventListener('click', function () {
-    var on = $('teacher').getAttribute('aria-pressed') !== 'true';
-    $('teacher').setAttribute('aria-pressed', String(on));
-    $('teacher').textContent = on ? 'Modo docente: ocultar respuestas' : 'Modo docente: mostrar respuestas';
-    ['s1sol','s2sol','s3sol'].forEach(function (id) { $(id).hidden = !on; });
-  });
 
   function showTab(name) {
     ['transformar', 'sistemas', 'actividad'].forEach(function (t) {
