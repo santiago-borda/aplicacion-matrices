@@ -102,6 +102,8 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 .grid3 .box:nth-child(2) { --acc: var(--orange); }
 .grid3 .box:nth-child(3) { --acc: var(--plum); }
 .grid3 .box h2 { color: var(--acc); }
+.grid3 .vgrid { border-color: var(--acc); }
+.vlab { font-size: 1.05rem; }
 .grid3 .box p.mono { background: color-mix(in srgb, var(--acc) 10%, var(--surface)); border-radius: 8px; padding: 8px 10px; color: var(--ink); }
 .grid3 .btn:not(.alt) { background: var(--acc); color: var(--surface); }
 #p-actividad > .panel > .row:first-child { background: color-mix(in srgb, var(--teal) 8%, var(--surface)); border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: 12px; padding: 12px 14px; }
@@ -231,10 +233,10 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 <div class="grid3">
 <div class="box">
 <h2>1 · Reconocer</h2>
-<p class="mono">A = [0, 1; −1, 0] &nbsp; v = (2, 1)</p>
+<p class="mono eq"><span>A =</span><span class="mat"><span>0</span><span>1</span><span>−1</span><span>0</span></span><span>v = (2, 1)</span></p>
 <p>Calculá A·v e indicá qué transformación es.</p>
 <div class="challenge">
-<div class="pair"><div><label class="l" for="c1x">x</label><input autocomplete="off" type="number" step="any" id="c1x"></div><div><label class="l" for="c1y">y</label><input autocomplete="off" type="number" step="any" id="c1y"></div></div>
+<div class="row"><span class="mono vlab">A·v =</span><div class="vgrid"><input autocomplete="off" type="number" step="any" id="c1x" aria-label="A por v, primera componente (x)"><input autocomplete="off" type="number" step="any" id="c1y" aria-label="A por v, segunda componente (y)"></div></div>
 <div><label class="l" for="c1t">Transformación</label>
 <select autocomplete="off" id="c1t"><option value="">Elegir…</option><option value="anti">Rotación 90° antihoraria</option><option value="hor">Rotación 90° horaria</option><option value="esc">Escalado</option><option value="ref">Reflexión</option><option value="cor">Corte</option></select></div>
 <div class="row"><button class="btn" data-check="1">Comprobar</button><span class="status" id="r1" role="status"></span></div>
@@ -242,11 +244,11 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 </div>
 <div class="box">
 <h2>2 · Ordenar</h2>
-<p class="mono">S = [2, 0; 0, 1] &nbsp; T = [1, 1; 0, 1] &nbsp; v = (1, 2)</p>
+<p class="mono eq"><span>S =</span><span class="mat"><span>2</span><span>0</span><span>0</span><span>1</span></span><span>T =</span><span class="mat"><span>1</span><span>1</span><span>0</span><span>1</span></span><span>v = (1, 2)</span></p>
 <p>Calculá T·(S·v) y S·(T·v). ¿Coinciden?</p>
 <div class="challenge">
-<div><label class="l">T·(S·v)</label><div class="pair"><input autocomplete="off" type="number" step="any" id="c2ax" aria-label="T por S por v, x"><input autocomplete="off" type="number" step="any" id="c2ay" aria-label="T por S por v, y"></div></div>
-<div><label class="l">S·(T·v)</label><div class="pair"><input autocomplete="off" type="number" step="any" id="c2bx" aria-label="S por T por v, x"><input autocomplete="off" type="number" step="any" id="c2by" aria-label="S por T por v, y"></div></div>
+<div class="row"><span class="mono vlab">T·(S·v) =</span><div class="vgrid"><input autocomplete="off" type="number" step="any" id="c2ax" aria-label="T por S por v, x"><input autocomplete="off" type="number" step="any" id="c2ay" aria-label="T por S por v, y"></div></div>
+<div class="row"><span class="mono vlab">S·(T·v) =</span><div class="vgrid"><input autocomplete="off" type="number" step="any" id="c2bx" aria-label="S por T por v, x"><input autocomplete="off" type="number" step="any" id="c2by" aria-label="S por T por v, y"></div></div>
 <div><label class="l" for="c2s">¿Coinciden?</label><select autocomplete="off" id="c2s"><option value="">Elegir…</option><option value="si">Sí</option><option value="no">No</option></select></div>
 <div class="row"><button class="btn" data-check="2">Comprobar</button><span class="status" id="r2" role="status"></span></div>
 </div>
