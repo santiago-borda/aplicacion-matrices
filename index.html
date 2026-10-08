@@ -234,7 +234,7 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 <p class="mono">A = [0, 1; −1, 0] &nbsp; v = (2, 1)</p>
 <p>Calculá A·v e indicá qué transformación es.</p>
 <div class="challenge">
-<div class="pair"><div><label class="l" for="c1x">x</label><input autocomplete="off" type="text" inputmode="decimal" id="c1x"></div><div><label class="l" for="c1y">y</label><input autocomplete="off" type="text" inputmode="decimal" id="c1y"></div></div>
+<div class="pair"><div><label class="l" for="c1x">x</label><input autocomplete="off" type="number" step="any" id="c1x"></div><div><label class="l" for="c1y">y</label><input autocomplete="off" type="number" step="any" id="c1y"></div></div>
 <div><label class="l" for="c1t">Transformación</label>
 <select autocomplete="off" id="c1t"><option value="">Elegir…</option><option value="anti">Rotación 90° antihoraria</option><option value="hor">Rotación 90° horaria</option><option value="esc">Escalado</option><option value="ref">Reflexión</option><option value="cor">Corte</option></select></div>
 <div class="row"><button class="btn" data-check="1">Comprobar</button><span class="status" id="r1" role="status"></span></div>
@@ -245,8 +245,8 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 <p class="mono">S = [2, 0; 0, 1] &nbsp; T = [1, 1; 0, 1] &nbsp; v = (1, 2)</p>
 <p>Calculá T·(S·v) y S·(T·v). ¿Coinciden?</p>
 <div class="challenge">
-<div><label class="l">T·(S·v)</label><div class="pair"><input autocomplete="off" type="text" inputmode="decimal" id="c2ax" aria-label="T por S por v, x"><input autocomplete="off" type="text" inputmode="decimal" id="c2ay" aria-label="T por S por v, y"></div></div>
-<div><label class="l">S·(T·v)</label><div class="pair"><input autocomplete="off" type="text" inputmode="decimal" id="c2bx" aria-label="S por T por v, x"><input autocomplete="off" type="text" inputmode="decimal" id="c2by" aria-label="S por T por v, y"></div></div>
+<div><label class="l">T·(S·v)</label><div class="pair"><input autocomplete="off" type="number" step="any" id="c2ax" aria-label="T por S por v, x"><input autocomplete="off" type="number" step="any" id="c2ay" aria-label="T por S por v, y"></div></div>
+<div><label class="l">S·(T·v)</label><div class="pair"><input autocomplete="off" type="number" step="any" id="c2bx" aria-label="S por T por v, x"><input autocomplete="off" type="number" step="any" id="c2by" aria-label="S por T por v, y"></div></div>
 <div><label class="l" for="c2s">¿Coinciden?</label><select autocomplete="off" id="c2s"><option value="">Elegir…</option><option value="si">Sí</option><option value="no">No</option></select></div>
 <div class="row"><button class="btn" data-check="2">Comprobar</button><span class="status" id="r2" role="status"></span></div>
 </div>
@@ -255,7 +255,7 @@ label.l { font-size: 0.85rem; color: var(--muted); display: block; margin-bottom
 <h2>3 · Resolver</h2>
 <p>Una API recibió 10 peticiones. Cada GET cuesta 2 créditos y cada POST 3. Se gastaron 24 créditos.</p>
 <div class="challenge">
-<div class="pair"><div><label class="l" for="c3x">GET</label><input autocomplete="off" type="text" inputmode="decimal" id="c3x"></div><div><label class="l" for="c3y">POST</label><input autocomplete="off" type="text" inputmode="decimal" id="c3y"></div></div>
+<div class="pair"><div><label class="l" for="c3x">GET</label><input autocomplete="off" type="number" step="any" id="c3x"></div><div><label class="l" for="c3y">POST</label><input autocomplete="off" type="number" step="any" id="c3y"></div></div>
 <p class="hint">Pista: x + y = 10 y 2x + 3y = 24. Cargalo en la pestaña Sistemas con el botón GET y POST.</p>
 <div class="row"><button class="btn" data-check="3">Comprobar</button><span class="status" id="r3" role="status"></span></div>
 </div>
